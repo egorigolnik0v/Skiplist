@@ -29,13 +29,13 @@ public:
 std::vector<OneNode<T>> list;
 int height;
     
-    Skiplist() : list {}, height(0) {}
+Skiplist() : list {}, height(0) {}
     
-    template <typename Iterator>
-    Skiplist(Iterator begin, Iterator end) : list{}, height(0) {
-  	  for (auto it = begin; it != end; ++it) {insert(*it);}}
+template <typename Iterator>
+Skiplist(Iterator begin, Iterator end) : list{}, height(0) {
+for (auto it = begin; it != end; ++it) {insert(*it);}}
                         
-     Skiplist(std::vector<OneNode<T>> li) : list(li), height(1) {}
+Skiplist(std::vector<OneNode<T>> li) : list(li), height(1) {}
      
            
 bool find(const T& value) {
@@ -80,11 +80,18 @@ OneNode<T>* current = &(list[level]);
 while (current->right && current->right->val < value) {
 current = current->right;}
 
-if (current->right == nullptr) {
+if (current->right == nullptr && current->val < value) {
 OneNode<T>* neW = new OneNode<T>;
 neW -> val = value;
 current->right= neW;
 neW -> right = nullptr;
+return neW;}
+
+if (current->right == nullptr && current->val > value) {
+OneNode<T>* neW = new OneNode<T>;
+neW -> val = value;
+neW->right= current;
+list[level] = *neW;
 return neW;}
 
 else {
@@ -119,7 +126,6 @@ for (int i = counter; i>0; i--){
 list_of_new[counter-i]->down = list_of_new[counter-i+1];
 
 }
-
 }
 
 else{
@@ -148,13 +154,11 @@ list_of_new[counter-i]->down = list_of_new[counter-i+1];
 }}
 
 
-
 void delete_on_level (int level, const T& value){
 
 OneNode<T>* current = &(list[level]);
 
 if (current->val == value){
-
 
 if(current->right == nullptr){
 delete current;
@@ -164,12 +168,7 @@ else if(current->right != nullptr && current->right){
 
 (list[level]) = *(current->right);
 
-
-
-}
-
-
-}
+}}
 
 else if(current->right->right && current->right->val == value){
 auto A = current;
@@ -181,7 +180,6 @@ delete B;
 }
 
 else if(current->right->right == nullptr && current->right->val == value){
-current->right = nullptr;
 delete current->right;
 
 }
@@ -211,10 +209,7 @@ delete B;}
 else if(current){
 delete current;}
 
-}
-
-}
-
+}}
 
 
 
@@ -223,18 +218,21 @@ int find_on_the_top_level (const T& value){
 int idx = list.size() - 1;
 OneNode<T>* current = &list[idx];
 for (int i =idx; i>=0; i--){
+
+cout << current->val << endl;
 while (current->right && current->right->val < value){
-current = current->right;}
+current = current->right;
+cout << "right" << endl;
+cout << current->val << endl;}
 if (current->right && current->right->val == value) {
 return idx;}
 if (current->val == value){
 return idx;}
-if(current->down){
-current = current->down;}
-}
-
-
-}
+else if(current->down){
+current = current->down;
+cout<<"down" << endl;}
+cout << current->val << endl;
+}}
 
 
 void remove (const T& value){
@@ -242,12 +240,7 @@ if(find(value)){
 int idx = find_on_the_top_level(value);
 for (int i = idx; i>=0; i--){
 delete_on_level(i, value);
-}
-}
-}
-
-
-
+}}}
 
   
 };
@@ -268,13 +261,11 @@ s.delete_on_level(0,1);
 
 s.print();
 
-s.remove(2);
-
-s.print();
-
 s.delete_on_level(0,2);
 
 s.print();
+
+cout << s.find_on_the_top_level(5)  <<endl;
 
 return 0;
 }
